@@ -39,6 +39,7 @@ app.use(
       httpOnly: true,
       secure: true,
       sameSite: "None",
+      domain: "moneymate-88650a279acc.herokuapp.com",
     },
   })
 );
