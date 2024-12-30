@@ -15,8 +15,11 @@ MongoConnect();
 
 app.use(
   cors({
-    origin:
-      "http://localhost:5173, https://moneymate-frontend-drab.vercel.app, https://moneymate.manankanani.in",
+    origin: [
+      "http://localhost:5173",
+      "https://moneymate-frontend-drab.vercel.app",
+      "https://moneymate.manankanani.in",
+    ],
     credentials: true,
   })
 );
