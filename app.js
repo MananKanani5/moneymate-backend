@@ -15,10 +15,7 @@ MongoConnect();
 
 app.use(
   cors({
-    origin: [
-      "https://moneymate-frontend-drab.vercel.app",
-      "http://localhost:5173",
-    ],
+    origin: "*",
     credentials: true,
   })
 );
@@ -38,7 +35,7 @@ app.use(
       maxAge: 1000 * 60 * 60 * 24,
       httpOnly: true,
       secure: true,
-      sameSite: "None",
+      SameSite: "None",
       domain: "moneymate-88650a279acc.herokuapp.com",
     },
   })
