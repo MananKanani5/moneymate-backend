@@ -15,7 +15,10 @@ MongoConnect();
 
 app.use(
   cors({
-    origin: "https://moneymate-frontend-drab.vercel.app",
+    origin: [
+      "https://moneymate-frontend-drab.vercel.app",
+      "http://localhost:5173",
+    ],
     credentials: true,
   })
 );
