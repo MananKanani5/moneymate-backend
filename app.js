@@ -15,7 +15,7 @@ MongoConnect();
 
 app.use(
   cors({
-    origin: "*",
+    origin: "https://moneymate-frontend-drab.vercel.app",
     credentials: true,
   })
 );
