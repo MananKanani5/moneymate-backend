@@ -40,6 +40,7 @@ app.use(
       httpOnly: true,
       secure: false,
       sameSite: "None",
+      secure: process.env.NODE_ENV === "production",
     },
   })
 );
