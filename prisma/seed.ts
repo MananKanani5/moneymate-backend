@@ -6,11 +6,11 @@ async function main() {
     console.log("Seeding default expense categories...");
 
     const categories = [
-        { categoryName: "Food", categoryColor: "#FF5733" },
-        { categoryName: "Transport", categoryColor: "#33A1FF" },
-        { categoryName: "Entertainment", categoryColor: "#FF33E1" },
-        { categoryName: "Personal", categoryColor: "#FFD700" },
-        { categoryName: "Misc", categoryColor: "#808080" }
+        { categoryName: "Food", categoryColor: "#086942" },
+        { categoryName: "Transport", categoryColor: "#fdba1a" },
+        { categoryName: "Entertainment", categoryColor: "#e6111b" },
+        { categoryName: "Personal", categoryColor: "#00509d" },
+        { categoryName: "Misc", categoryColor: "#00509d30" }
     ];
 
     for (const category of categories) {
