@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               Int       @id @unique @default(autoincrement())
+  firstName        String    @map("first_name")
+  lastName         String    @map("last_name")
+  phoneNumber      String    @map("phone_number")
+  email            String    @unique @map("email")
+  password         String    @map("password")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  resetToken       String?   @map("reset_token")
+  resetTokenExpiry DateTime? @map("reset_token_expiry")
+  Expense          Expense[]
+  Budget           Budget[]
+
+  @@index([email])
+  @@index([phoneNumber])
+  @@index([createdAt])
+}
+
+model Expense {
+  id          Int             @id @unique @default(autoincrement())
+  dateTime    DateTime        @map("date_time")
+  amount      Decimal         @map("amount")
+  category    ExpenseCategory @relation(fields: [categoryId], references: [id])
+  categoryId  Int             @map("category_id")
+  description String          @map("description")
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      Int             @map("user_id")
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+
+  @@index([userId, dateTime])
+  @@index([categoryId])
+  @@index([createdAt])
+}
+
+model ExpenseCategory {
+  id            Int       @id @unique @default(autoincrement())
+  categoryName  String    @unique @map("category_name")
+  categoryColor String    @unique @map("category_color")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  Expense       Expense[]
+}
+
+model Budget {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int      @map("user_id")
+  month     Int      @map("month")
+  year      Int      @map("year")
+  amount    Decimal  @map("amount")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, month, year])
+}
