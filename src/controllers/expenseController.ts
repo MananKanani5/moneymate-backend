@@ -9,9 +9,12 @@ import { validateCreateExpenseSchema, validateUpdateExpenseSchema } from "../val
 import dayjs from "dayjs";
 import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
+
+
 import isoWeek from "dayjs/plugin/isoWeek";
-import { getFilterAndSortingOptions } from "../utils/filtersUtil";
 dayjs.extend(isoWeek);
+import { getFilterAndSortingOptions } from "../utils/filtersUtil";
+
 
 export const getAllExpense = async (req: Request, res: Response): Promise<void> => {
     const { take, skip, page, pageSize } = getPaginationOptions(req.query, parseInt(process.env.DEFAULT_PAGE_SIZE || "10", 10));
@@ -29,7 +32,7 @@ export const getAllExpense = async (req: Request, res: Response): Promise<void> 
         })
 
         if (expenses.length === 0) {
-            sendResponse(res, false, null, "No Expense Found", STATUS_CODES.NOT_FOUND);
+            sendResponse(res, true, [], "No Expense Found", STATUS_CODES.OK);
             return;
         }
 
