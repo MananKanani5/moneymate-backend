@@ -8,7 +8,9 @@ import { validateCreateExpenseSchema, validateUpdateExpenseSchema } from "../val
 
 import dayjs from "dayjs";
 import utc from 'dayjs/plugin/utc';
+import timezone from "dayjs/plugin/timezone";
 dayjs.extend(utc);
+dayjs.extend(timezone);
 
 
 import isoWeek from "dayjs/plugin/isoWeek";
@@ -53,6 +55,7 @@ export const getAllExpense = async (req: Request, res: Response): Promise<void> 
     }
 
 }
+
 export const getExpeseById = async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
     const { error } = validateidParamSchema({ id });
@@ -88,9 +91,10 @@ export const createExpense = async (req: Request, res: Response): Promise<void> 
     const { date, time, amount, categoryId, description } = req.body;
 
     try {
-        const dateTime = dayjs(`${date} ${time}`, 'YYYY-MM-DD HH:mm').utc().toISOString();
-        const currentMonth = dayjs.utc().month() + 1;
-        const currentYear = dayjs.utc().year();
+        const now = dayjs().tz("Asia/Kolkata");
+        const currentMonth = now.month() + 1;
+        const currentYear = now.year();
+        const dateTime = dayjs.tz(`${date} ${time}`, "YYYY-MM-DD HH:mm", "Asia/Kolkata").utc().toISOString();
 
         const budget = await prisma.budget.findFirst({
             where: { userId, month: currentMonth, year: currentYear },
@@ -102,8 +106,8 @@ export const createExpense = async (req: Request, res: Response): Promise<void> 
         }
 
         const budgetAmount = Number(budget.amount);
-        const startOfMonth = dayjs.utc().startOf("month").toDate();
-        const endOfMonth = dayjs.utc().add(1, "month").startOf("month").toDate();
+        const startOfMonth = now.startOf("month").utc().toDate();
+        const endOfMonth = now.endOf("month").utc().toDate();
 
         const totalExpenses = await prisma.expense.aggregate({
             where: { userId, dateTime: { gte: startOfMonth, lt: endOfMonth } },
@@ -219,6 +223,8 @@ export const getDashboardData = async (req: Request, res: Response): Promise<voi
     const userId = req.user?.id;
 
     try {
+        const now = dayjs().utc().add(5, "hour").add(30, "minute");
+
         const lastTransactions = await prisma.expense.findMany({
             where: { userId },
             orderBy: { dateTime: "desc" },
@@ -229,7 +235,7 @@ export const getDashboardData = async (req: Request, res: Response): Promise<voi
         const categoryWiseExpenses = await prisma.expense.groupBy({
             by: ["categoryId"],
             _sum: { amount: true },
-            where: { userId, dateTime: { gte: dayjs.utc().startOf("month").toDate() } }
+            where: { userId, dateTime: { gte: now.startOf("month").utc().toDate() } }
         });
 
         const categoryIds = categoryWiseExpenses.map(exp => exp.categoryId);
@@ -282,8 +288,8 @@ export const getDashboardData = async (req: Request, res: Response): Promise<voi
             }
         });
 
-        const startOfMonth = dayjs.utc().startOf("month").toDate();
-        const endOfMonth = dayjs.utc().endOf("month").toDate();
+        const startOfMonth = now.startOf("month").utc().toDate();
+        const endOfMonth = now.endOf("month").utc().toDate();
 
         const totalExpenseCurrentMonth = await prisma.expense.aggregate({
             where: {
@@ -294,9 +300,8 @@ export const getDashboardData = async (req: Request, res: Response): Promise<voi
         });
 
         const totalExpense = totalExpenseCurrentMonth._sum.amount || 0;
-
-        const currentMonth = dayjs.utc().month() + 1;
-        const currentYear = dayjs.utc().year();
+        const currentMonth = now.month() + 1;
+        const currentYear = now.year();
 
         const budget = await prisma.budget.findFirst({
             where: { userId, month: currentMonth, year: currentYear }
