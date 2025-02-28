@@ -5,7 +5,13 @@ const emailSchema = Joi.string().trim().email().lowercase().required();
 const phoneSchema = Joi.string()
     .trim()
     .pattern(/^[0-9]{10,15}$/)
-    .required();
+    .required()
+    .messages({
+        "string.pattern.base": "Phone number must be between 10 to 15 digits and contain only numbers.",
+        "any.required": "Phone number is required.",
+        "string.empty": "Phone number cannot be empty.",
+    });
+
 const passwordSchema = Joi.string()
     .trim()
     .min(8)

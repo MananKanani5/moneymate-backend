@@ -13,8 +13,9 @@ export const setBudget = async (req: Request, res: Response): Promise<void> => {
         return;
     }
 
-    const currentMonth = dayjs.utc().month() + 1;
-    const currentYear = dayjs.utc().year();
+    const now = dayjs().tz("Asia/Kolkata");
+    const currentMonth = now.month() + 1;
+    const currentYear = now.year();
 
     try {
         const existingBudget = await prisma.budget.findFirst({
