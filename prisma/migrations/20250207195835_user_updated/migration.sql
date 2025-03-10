@@ -1,3 +1,0 @@
--- AlterTable
-ALTER TABLE "User" ADD COLUMN     "reset_token" TEXT NOT NULL DEFAULT '0',
-ADD COLUMN     "reset_token_expiry" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;

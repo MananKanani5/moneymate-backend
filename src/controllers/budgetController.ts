@@ -5,7 +5,7 @@ import STATUS_CODES from "../utils/statusCodes";
 import dayjs from "dayjs";
 
 export const setBudget = async (req: Request, res: Response): Promise<void> => {
-    const userId = req.user?.id as number;
+    const userId = req.user?.id as string;
     const { amount } = req.body;
 
     if (!amount || amount <= 0) {
@@ -30,7 +30,7 @@ export const setBudget = async (req: Request, res: Response): Promise<void> => {
         const newBudget = await prisma.budget.create({
             data: {
                 userId,
-                amount,
+                amount: Number(amount),
                 month: currentMonth,
                 year: currentYear
             }
@@ -43,7 +43,7 @@ export const setBudget = async (req: Request, res: Response): Promise<void> => {
 };
 
 export const updateBudget = async (req: Request, res: Response): Promise<void> => {
-    const userId = req.user?.id;
+    const userId = req.user?.id as string;
     const { id } = req.params;
     const { amount } = req.body;
 
@@ -53,20 +53,17 @@ export const updateBudget = async (req: Request, res: Response): Promise<void> =
     }
 
     try {
-        // ✅ Check if budget exists
-        const budget = await prisma.budget.findUnique({
-            where: { id: parseInt(id, 10) }
+        const budget = await prisma.budget.findFirst({
+            where: { id }
         });
 
         if (!budget || budget.userId !== userId) {
             sendResponse(res, false, null, "Budget not found or unauthorized access.", STATUS_CODES.NOT_FOUND);
             return;
         }
-
-        // ✅ Update the budget
         const updatedBudget = await prisma.budget.update({
             where: { id: budget.id },
-            data: { amount }
+            data: { amount: Number(amount) }
         });
 
         sendResponse(res, true, updatedBudget, "Budget updated successfully.", STATUS_CODES.OK);
@@ -76,7 +73,7 @@ export const updateBudget = async (req: Request, res: Response): Promise<void> =
 };
 
 export const getCurrentBudget = async (req: Request, res: Response): Promise<void> => {
-    const userId = req.user?.id;
+    const userId = req.user?.id as string;
     const currentMonth = dayjs.utc().month() + 1;
     const currentYear = dayjs.utc().year();
 
@@ -97,7 +94,7 @@ export const getCurrentBudget = async (req: Request, res: Response): Promise<voi
 };
 
 export const getBudgetHistory = async (req: Request, res: Response): Promise<void> => {
-    const userId = req.user?.id;
+    const userId = req.user?.id as string;
 
     try {
         const budgets = await prisma.budget.findMany({

@@ -65,7 +65,7 @@ export const getExpeseById = async (req: Request, res: Response): Promise<void> 
     try {
 
         const expense = await prisma.expense.findUnique({
-            where: { id: parseInt(id, 10) }
+            where: { id }
         })
 
         if (!expense) {
@@ -87,7 +87,7 @@ export const createExpense = async (req: Request, res: Response): Promise<void> 
         return;
     }
 
-    const userId = req.user?.id as number;
+    const userId = req.user?.id as string;
     const { date, time, amount, categoryId, description } = req.body;
 
     try {
@@ -129,7 +129,7 @@ export const createExpense = async (req: Request, res: Response): Promise<void> 
                 dateTime,
                 amount: newExpenseAmount,
                 userId,
-                categoryId: parseInt(categoryId),
+                categoryId,
                 description
             }
         })
@@ -144,7 +144,7 @@ export const createExpense = async (req: Request, res: Response): Promise<void> 
 export const updateExpense = async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
     const { date, time, amount, categoryId, description } = req.body;
-    const userId = req.user?.id as number;
+    const userId = req.user?.id as string;
 
     const { error } = validateUpdateExpenseSchema(req.body);
     if (error) {
@@ -154,7 +154,7 @@ export const updateExpense = async (req: Request, res: Response): Promise<void> 
 
     try {
         const existingExpense = await prisma.expense.findFirst({
-            where: { id: parseInt(id), userId }
+            where: { id, userId }
         });
 
         if (!existingExpense) {
@@ -189,7 +189,7 @@ export const updateExpense = async (req: Request, res: Response): Promise<void> 
             where: {
                 userId,
                 dateTime: { gte: startOfMonth, lt: endOfMonth },
-                NOT: { id: parseInt(id) }
+                NOT: { id }
             },
             _sum: { amount: true }
         });
@@ -209,7 +209,7 @@ export const updateExpense = async (req: Request, res: Response): Promise<void> 
         if (description !== undefined) updateData.description = description;
 
         const updatedExpense = await prisma.expense.update({
-            where: { id: parseInt(id) },
+            where: { id },
             data: updateData
         });
 
@@ -220,7 +220,7 @@ export const updateExpense = async (req: Request, res: Response): Promise<void> 
 };
 
 export const getDashboardData = async (req: Request, res: Response): Promise<void> => {
-    const userId = req.user?.id;
+    const userId = req.user?.id as string;
 
     try {
         const now = dayjs().utc().add(5, "hour").add(30, "minute");
@@ -317,11 +317,11 @@ export const getDashboardData = async (req: Request, res: Response): Promise<voi
 
 export const deleteExpense = async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
-    const userId = req.user?.id as number;
+    const userId = req.user?.id as string;
 
     try {
         const existingExpense = await prisma.expense.findFirst({
-            where: { id: parseInt(id), userId }
+            where: { id, userId }
         });
 
         if (!existingExpense) {
@@ -330,7 +330,7 @@ export const deleteExpense = async (req: Request, res: Response): Promise<void> 
         }
 
         await prisma.expense.delete({
-            where: { id: parseInt(id) }
+            where: { id }
         });
 
         sendResponse(res, true, null, "Expense Deleted Successfully", STATUS_CODES.OK);
@@ -338,3 +338,17 @@ export const deleteExpense = async (req: Request, res: Response): Promise<void> 
         sendResponse(res, false, null, error.message, STATUS_CODES.SERVER_ERROR);
     }
 };
+
+export const getCategories = async (req: Request, res: Response): Promise<void> => {
+    try {
+
+        const categories = await prisma.expenseCategory.findMany();
+        if (!categories) {
+            sendResponse(res, false, null, "No Categories Found", STATUS_CODES.NOT_FOUND);
+            return;
+        }
+        sendResponse(res, true, categories, "", STATUS_CODES.OK);
+    } catch (error: any) {
+        sendResponse(res, false, null, error.message, STATUS_CODES.SERVER_ERROR);
+    }
+}

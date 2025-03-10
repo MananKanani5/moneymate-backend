@@ -3,64 +3,56 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id               Int       @id @unique @default(autoincrement())
-  firstName        String    @map("first_name")
-  lastName         String    @map("last_name")
-  phoneNumber      String    @map("phone_number")
-  email            String    @unique @map("email")
-  password         String    @map("password")
-  createdAt        DateTime  @default(now()) @map("created_at")
-  updatedAt        DateTime  @updatedAt @map("updated_at")
-  resetToken       String?   @map("reset_token")
-  resetTokenExpiry DateTime? @map("reset_token_expiry")
+  id               String    @id @default(auto()) @map("_id") @db.ObjectId
+  firstName        String
+  lastName         String
+  phoneNumber      String
+  email            String    @unique
+  password         String
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  resetToken       String?
+  resetTokenExpiry DateTime?
   Expense          Expense[]
   Budget           Budget[]
-
-  @@index([email])
-  @@index([phoneNumber])
-  @@index([createdAt])
 }
 
 model Expense {
-  id          Int             @id @unique @default(autoincrement())
-  dateTime    DateTime        @map("date_time")
-  amount      Decimal         @map("amount")
+  id          String          @id @default(auto()) @map("_id") @db.ObjectId
+  dateTime    DateTime
+  amount      Int
   category    ExpenseCategory @relation(fields: [categoryId], references: [id])
-  categoryId  Int             @map("category_id")
-  description String          @map("description")
+  categoryId  String          @db.ObjectId
+  description String
   user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      Int             @map("user_id")
-  createdAt   DateTime        @default(now()) @map("created_at")
-  updatedAt   DateTime        @updatedAt @map("updated_at")
-
-  @@index([userId, dateTime])
-  @@index([categoryId])
-  @@index([createdAt])
+  userId      String          @db.ObjectId
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
 }
 
 model ExpenseCategory {
-  id            Int       @id @unique @default(autoincrement())
-  categoryName  String    @unique @map("category_name")
-  categoryColor String    @unique @map("category_color")
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  categoryName  String    @unique
+  categoryColor String    @unique
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
   Expense       Expense[]
 }
 
 model Budget {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    Int      @map("user_id")
-  month     Int      @map("month")
-  year      Int      @map("year")
-  amount    Decimal  @map("amount")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  userId    String   @db.ObjectId
+  month     Int
+  year      Int
+  amount    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([userId, month, year])
 }

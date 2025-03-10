@@ -11,7 +11,7 @@ export const passportConfig = (passport: any): void => {
         new JwtStrategy(opts, async (jwtPayload: { id: string }, done) => {
             try {
                 const user = await prisma.user.findFirst({
-                    where: { id: parseInt(jwtPayload.id, 10) },
+                    where: { id: jwtPayload.id },
                 });
 
                 if (!user) {

@@ -26,13 +26,13 @@ export const getUserById = async (req: Request, res: Response): Promise<void> =>
         sendResponse(res, false, error, error.details[0].message, STATUS_CODES.BAD_REQUEST);
         return;
     }
-    if (parseInt(id, 10) !== req.user?.id) {
+    if (id !== req.user?.id) {
         sendResponse(res, false, null, "Unauthorized: You can only access your own profile", STATUS_CODES.FORBIDDEN);
         return;
     }
     try {
         const user = await prisma.user.findUnique({
-            where: { id: parseInt(id, 10) }, select: userWithoutPassword
+            where: { id }, select: userWithoutPassword
         })
 
         if (!user) {
@@ -222,7 +222,7 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
 
     try {
         const existingUser = await prisma.user.findUnique({
-            where: { id: parseInt(id, 10) }
+            where: { id }
         })
 
         if (!existingUser) {
@@ -230,13 +230,13 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
             return;
         }
 
-        if (parseInt(id, 10) !== req.user?.id) {
+        if (id !== req.user?.id) {
             sendResponse(res, false, null, "Unauthorized: You can only access your own profile", STATUS_CODES.FORBIDDEN);
             return;
         }
 
         const deletedUser = await prisma.user.delete({
-            where: { id: parseInt(id, 10) },
+            where: { id },
             select: userWithoutPassword
         })
 
@@ -267,7 +267,7 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
     try {
 
         const existingUser = await prisma.user.findUnique({
-            where: { id: parseInt(id, 10) }
+            where: { id }
         })
 
         if (!existingUser) {
@@ -278,7 +278,7 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
         const existingUserSameEmail = await prisma.user.findFirst({
             where: {
                 email,
-                id: { not: parseInt(id, 10) }
+                id: { not: id }
             }
         });
 
@@ -294,7 +294,7 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
         }
 
         const updatedUser = await prisma.user.update({
-            where: { id: parseInt(id, 10) },
+            where: { id },
             data: {
                 firstName,
                 lastName,

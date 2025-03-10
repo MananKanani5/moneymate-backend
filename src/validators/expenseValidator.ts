@@ -5,14 +5,14 @@ export const createExpenseSchema = Joi.object({
     time: Joi.string().required(),
     amount: Joi.number().required().min(1),
     description: Joi.string().optional(),
-    categoryId: Joi.number().required(),
+    categoryId: Joi.string().required(),
 });
 export const updateExpenseSchema = Joi.object({
     date: Joi.string().optional(),
     time: Joi.string().optional(),
     amount: Joi.number().optional().min(1),
     description: Joi.string().optional(),
-    categoryId: Joi.number().optional(),
+    categoryId: Joi.string().optional(),
 });
 
 export const validateCreateExpenseSchema = (data: any) => createExpenseSchema.validate(data, { abortEarly: false });
