@@ -54,5 +54,5 @@ model Budget {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([userId, month, year])
+  @@unique([userId, month, year], name: "userId_month_year")
 }
