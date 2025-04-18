@@ -161,15 +161,15 @@ export const updateExpense = async (req: Request, res: Response): Promise<void> 
             return;
         }
 
+        const updatedExpenseAmount = amount ? parseFloat(amount) : existingExpense.amount;
+        const now = dayjs().tz("Asia/Kolkata");
+        const currentMonth = now.month() + 1;
+        const currentYear = now.year();
+
         let updatedDate = existingExpense.dateTime;
         if (date && time) {
-            updatedDate = dayjs(`${date} ${time}`, "YYYY-MM-DD HH:mm").utc().toDate();
+            updatedDate = new Date(dayjs.tz(`${date} ${time}`, "YYYY-MM-DD HH:mm", "Asia/Kolkata").utc().toISOString());
         }
-
-        const updatedExpenseAmount = amount ? parseFloat(amount) : existingExpense.amount;
-
-        const currentMonth = dayjs.utc().month() + 1;
-        const currentYear = dayjs.utc().year();
 
         const budget = await prisma.budget.findFirst({
             where: { userId, month: currentMonth, year: currentYear },
@@ -216,8 +216,8 @@ export const updateExpense = async (req: Request, res: Response): Promise<void> 
     } catch (error: any) {
         sendResponse(res, false, null, error.message, STATUS_CODES.SERVER_ERROR);
     }
-};
 
+};
 export const getDashboardData = async (req: Request, res: Response): Promise<void> => {
     const userId = req.user?.id as string;
 
