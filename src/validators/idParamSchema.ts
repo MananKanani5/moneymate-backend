@@ -1,7 +1,7 @@
 import Joi from "joi";
 
 const idParamSchema = Joi.object({
-    id: Joi.number().required(),
+    id: Joi.string().required(),
 });
 
 export const validateidParamSchema = (idParam: any) => idParamSchema.validate(idParam);

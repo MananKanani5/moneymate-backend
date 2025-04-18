@@ -47,7 +47,6 @@ export const getAllExpense = async (req: Request, res: Response): Promise<void> 
             }
         });
         const response = formatPaginationResponse(expenses, totalRecords, page, pageSize, totalAmount);
-
         sendResponse(res, true, response, "Expenses Retrieved Successfully", STATUS_CODES.OK);
 
     } catch (error: any) {
@@ -205,7 +204,7 @@ export const updateExpense = async (req: Request, res: Response): Promise<void> 
         const updateData: any = {};
         if (date && time) updateData.dateTime = updatedDate;
         if (amount) updateData.amount = updatedExpenseAmount;
-        if (categoryId) updateData.categoryId = parseInt(categoryId);
+        if (categoryId) updateData.categoryId = categoryId;
         if (description !== undefined) updateData.description = description;
 
         const updatedExpense = await prisma.expense.update({
